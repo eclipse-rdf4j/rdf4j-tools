@@ -191,7 +191,7 @@ public class RepositoryController extends AbstractController {
 			try {
 				Query query = getQuery(repository, repositoryCon, queryStr, request, response);
 
-				View view;
+				QueryResultView view;
 				Object queryResult = null;
 				FileFormatServiceRegistry<? extends FileFormat, ?> registry;
 
