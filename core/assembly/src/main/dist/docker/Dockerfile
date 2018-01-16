@@ -1,8 +1,10 @@
 FROM tomcat:8.5-jre8-alpine
 MAINTAINER Bart Hanssens (bart.hanssens@bosa.fgov.be)
 
-ENV VERSION="2.2.4"
-ENV JAVA_OPTS="-Dorg.eclipse.rdf4j.appdata.basedir=/var/rdf4j"
+ARG VERSION="2.2.4"
+ARG JVM_PARAMS="-Xmx4g"
+
+ENV JAVA_OPTS="-Dorg.eclipse.rdf4j.appdata.basedir=/var/rdf4j $JVM_PARAMS"
 
 RUN cd /tmp && \
 	wget -q "http://www.eclipse.org/downloads/download.php?file=/rdf4j/eclipse-rdf4j-${VERSION}-sdk.zip&r=1" -O /tmp/rdf4j.zip && \
@@ -15,6 +17,7 @@ RUN cd /tmp && \
 COPY web.xml /usr/local/tomcat/conf/web.xml
 
 VOLUME /var/rdf4j
+VOLUME /usr/local/tomcat/logs
 
 EXPOSE 8080
 
