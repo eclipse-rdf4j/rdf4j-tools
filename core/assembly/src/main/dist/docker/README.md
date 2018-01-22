@@ -36,8 +36,10 @@ the exposed volumes can be mapped to existing directories on the host.
 
 Example:
 ```
-docker run -d -p 8080:8080 -e JAVA_OPTS="-Xms1g -Xmx4g" \
-	-v data:/var/rdf4j -v logs:/usr/local/tomcat/logs eclipse/rdf4j
+docker run -d -p 8080:8080 \ 
+	-e JAVA_OPTS="-Xms1g -Xmx4g" \
+	-v $HOME/data:/var/rdf4j -v $HOME/logs:/usr/local/tomcat/logs \
+	eclipse/rdf4j
 ```
 
 
@@ -50,4 +52,5 @@ The server will be accessible via http://yourhost:8080/rdf4j-server
 Please note that the RDF4J server in the docker container is not 
 password-protected, nor is it configured to use HTTPS. 
 Additional configuration may be required for running the container in 
-production environments. 
+production environments.
+ 
