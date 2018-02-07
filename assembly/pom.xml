@@ -173,7 +173,7 @@
 							<file>../notice.md</file>
 						</transformer>
 						<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
-							<resource>about.md</resource>
+								<resource>about.md</resource>
 							<file>../about.md</file>
 						</transformer>
 					</transformers>
