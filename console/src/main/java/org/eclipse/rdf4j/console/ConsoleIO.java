@@ -16,6 +16,7 @@ import org.eclipse.rdf4j.rio.RDFParseException;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.impl.DefaultParser;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
@@ -45,8 +46,8 @@ public class ConsoleIO {
 	 */
 	public ConsoleIO(InputStream input, OutputStream out, ConsoleState info) throws IOException {
 		this.terminal = TerminalBuilder.builder().system(false).streams(input, out).build();
-		this.input = LineReaderBuilder.builder().terminal(terminal).build();
-		this.appInfo = info;
+		this.input = buildLineReader(terminal);
+		this.appInfo = info; 
 	}
 
 	/**
@@ -57,8 +58,34 @@ public class ConsoleIO {
 	 */
 	public ConsoleIO(ConsoleState info) throws IOException {
 		this.terminal = TerminalBuilder.terminal();
-		this.input = LineReaderBuilder.builder().terminal(terminal).build();
+		this.input = buildLineReader(terminal);
 		this.appInfo = info;
+	}
+
+	/**
+	 * Constructor, mainly for testing
+	 * 
+	 * @param terminal
+	 * @param reader
+	 * @param info
+	 * @throws IOException 
+	 */
+	protected ConsoleIO(Terminal terminal, LineReader reader, ConsoleState info) throws IOException {
+		this.terminal = terminal;
+		this.input = reader;
+		this.appInfo = info;
+	}
+
+	/**
+	 * Build a line reader, using default parser without escape characters.
+	 * 
+	 * @param terminal
+	 * @return line reader
+	 */
+	protected static LineReader buildLineReader(Terminal terminal) {
+		DefaultParser parser = new DefaultParser();
+		parser.setEscapeChars(new char[0]); // don't escape, especially not within SPARQL with REGEX()
+		return LineReaderBuilder.builder().parser(parser).terminal(terminal).build();
 	}
 
 	/**

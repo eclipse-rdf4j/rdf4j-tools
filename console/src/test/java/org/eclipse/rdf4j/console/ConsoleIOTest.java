@@ -13,24 +13,31 @@ import static org.mockito.Mockito.mock;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.eclipse.rdf4j.console.ConsoleIO;
-import org.eclipse.rdf4j.console.ConsoleState;
+import org.assertj.core.api.AbstractBooleanAssert;
+
+import org.jline.reader.LineReader;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Mockito.when;
 
 public class ConsoleIOTest {
 
 	private ConsoleIO io;
-
+	private LineReader reader;
+	
 	@Before
-	public void initConsoleObject()
-		throws IOException
-	{
+	public void initConsoleObject() throws IOException {
 		InputStream input = mock(InputStream.class);
-		OutputStream out = mock(OutputStream.class);
+		OutputStream out =  mock(OutputStream.class);
+		Terminal terminal = TerminalBuilder.builder().streams(input, out).build();
+		
+		reader = mock(LineReader.class);
 		ConsoleState info = mock(ConsoleState.class);
-		io = new ConsoleIO(input, out, info);
+
+		io = new ConsoleIO(terminal, reader, info);
 	}
 
 	@Test
@@ -49,5 +56,14 @@ public class ConsoleIOTest {
 	public void shouldSetErroWrittenOnWriteUnoppenedError() {
 		io.writeUnopenedError();
 		assertThat(io.wasErrorWritten()).isTrue();
+	}
+	
+	@Test
+	public void shouldNotEscapeCharacters() throws IOException {
+		String qry = "SELECT ?r WHERE {?s ?p ?o . BIND(REPLACE(?o, '\\.', 'x') AS ?r) }";
+		
+		when(reader.readLine("> ")).thenReturn(qry).thenReturn(".");
+		
+		assertThat(qry).isEqualTo(io.readMultiLineInput());
 	}
 }
