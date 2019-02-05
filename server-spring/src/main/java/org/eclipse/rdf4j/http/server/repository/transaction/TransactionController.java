@@ -579,7 +579,6 @@ public class TransactionController extends AbstractController {
 			throw new ClientHTTPException(SC_NOT_ACCEPTABLE, "Could not read SPARQL update string from body.");
 		}
 
-
 		logger.debug("SPARQL update string: {}", sparqlUpdateString);
 
 		// default query language is SPARQL
