@@ -131,7 +131,7 @@ public class SparqlTest extends AbstractCommandTest {
 	}
 
     @Test
-	public final void testInputOutputFilePrefix() throws IOException {
+    public final void testInputOutputFilePrefix() throws IOException {
 		File f = LOCATION.newFile("select-prefix.qr");
 		copyFromResource("sparql/select-prefix.qr", f);
 		
