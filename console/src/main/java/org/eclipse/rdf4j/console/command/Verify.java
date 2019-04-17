@@ -166,7 +166,7 @@ public class Verify extends ConsoleCommand {
 		// load shapes first
 		boolean loaded = false;
 		try {
-			consoleIO.writeError("Loading shapes from " + shaclPath);
+			consoleIO.writeln("Loading shapes from " + shaclPath);
 
 			URL shaclURL = new URL(shaclPath);
 			RDFFormat format = Rio.getParserFormatForFileName(shaclPath).orElseThrow(Rio.unsupportedFormat(shaclPath));
@@ -182,7 +182,7 @@ public class Verify extends ConsoleCommand {
 		}
 
 		if (!loaded) {
-			consoleIO.writeln("No shapes found");
+			consoleIO.writeError("No shapes found");
 			repo.shutDown();
 			return;
 		}
@@ -206,7 +206,7 @@ public class Verify extends ConsoleCommand {
 		} catch (RepositoryException e) {
 			Throwable cause = e.getCause();
 			if (cause instanceof ShaclSailValidationException) {
-				consoleIO.writeln("SHACL validation failed, writing report to " + reportFile);
+				consoleIO.writeError("SHACL validation failed, writing report to " + reportFile);
 				ShaclSailValidationException sv = (ShaclSailValidationException) cause;
 				writeReport(sv.validationReportAsModel(), reportFile);
 			}
