@@ -242,8 +242,8 @@ public class Verify extends ConsoleCommand {
 	}
 
 	/**
-	 * Write SHACL validation report to a file.
-	 * File extension is used to select the serialization format, TTL is used as default.
+	 * Write SHACL validation report to a file. File extension is used to select the serialization format, TTL is used
+	 * as default.
 	 * 
 	 * @param model      report
 	 * @param reportFile file name
