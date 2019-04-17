@@ -108,7 +108,7 @@ public class VerifyTest extends AbstractCommandTest {
 		assertTrue(io.wasErrorWritten());
 		assertTrue(Files.size(report.toPath()) > 0);
 	}
-	
+
 	@Test
 	public final void testShaclValid() throws IOException {
 		File report = LOCATION.newFile();

@@ -15,6 +15,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import org.eclipse.rdf4j.IsolationLevels;
+
 import org.eclipse.rdf4j.console.ConsoleIO;
 import org.eclipse.rdf4j.console.VerificationListener;
 
@@ -31,7 +33,9 @@ import org.eclipse.rdf4j.rio.RDFParseException;
 import org.eclipse.rdf4j.rio.RDFParser;
 import org.eclipse.rdf4j.rio.Rio;
 import org.eclipse.rdf4j.rio.UnsupportedRDFormatException;
+import org.eclipse.rdf4j.rio.WriterConfig;
 import org.eclipse.rdf4j.rio.helpers.BasicParserSettings;
+import org.eclipse.rdf4j.rio.helpers.BasicWriterSettings;
 
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
 import org.eclipse.rdf4j.sail.shacl.ShaclSail;
@@ -154,14 +158,16 @@ public class Verify extends ConsoleCommand {
 	/**
 	 * Validate an RDF data source using a SHACL file or URL, writing the report to a file
 	 * 
-	 * @param dataPath  file or URL of the data to be validated
-	 * @param shaclPath file or URL of the SHACL
-	 * @parem reportFile file to write validation report to
+	 * @param dataPath   file or URL of the data to be validated
+	 * @param shaclPath  file or URL of the SHACL
+	 * @param reportFile file to write validation report to
 	 */
 	private void shacl(String dataPath, String shaclPath, String reportFile) {
 		ShaclSail sail = new ShaclSail(new MemoryStore());
 		SailRepository repo = new SailRepository(sail);
 		repo.init();
+
+		sail.disableValidation();
 
 		// load shapes first
 		boolean loaded = false;
@@ -172,7 +178,9 @@ public class Verify extends ConsoleCommand {
 			RDFFormat format = Rio.getParserFormatForFileName(shaclPath).orElseThrow(Rio.unsupportedFormat(shaclPath));
 
 			try (SailRepositoryConnection conn = repo.getConnection()) {
+				conn.begin(IsolationLevels.NONE);
 				conn.add(shaclURL, "", format, RDF4J.SHACL_SHAPE_GRAPH);
+				conn.commit();
 			}
 			loaded = true;
 		} catch (MalformedURLException e) {
@@ -187,15 +195,16 @@ public class Verify extends ConsoleCommand {
 			return;
 		}
 
-		sail.setParallelValidation(false);
-		sail.setRdfsSubClassReasoning(false);
+		sail.enableValidation();
 
 		try {
 			URL dataURL = new URL(dataPath);
 			RDFFormat format = Rio.getParserFormatForFileName(dataPath).orElseThrow(Rio.unsupportedFormat(dataPath));
 
 			try (SailRepositoryConnection conn = repo.getConnection()) {
+				conn.begin(IsolationLevels.NONE);
 				conn.add(dataURL, "", format);
+				conn.commit();
 			}
 
 			consoleIO.writeln("SHACL validation OK");
@@ -239,8 +248,11 @@ public class Verify extends ConsoleCommand {
 	 * @param reportFile file name
 	 */
 	private void writeReport(Model model, String reportFile) {
+		WriterConfig cfg = new WriterConfig();
+		cfg.set(BasicWriterSettings.PRETTY_PRINT, true);
+
 		try (Writer w = Files.newBufferedWriter(Paths.get(reportFile))) {
-			Rio.write(model, w, RDFFormat.TURTLE);
+			Rio.write(model, w, RDFFormat.TURTLE, cfg);
 		} catch (IOException ex) {
 			consoleIO.writeError("Could not write report to " + reportFile);
 		}
