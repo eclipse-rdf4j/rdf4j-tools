@@ -156,7 +156,7 @@ public class Verify extends ConsoleCommand {
 	}
 
 	/**
-	 * Validate an RDF data source using a SHACL file or URL, writing the report to a file
+	 * Validate an RDF data source using a SHACL file or URL, writing the report to a file.
 	 * 
 	 * @param dataPath   file or URL of the data to be validated
 	 * @param shaclPath  file or URL of the SHACL
@@ -169,13 +169,13 @@ public class Verify extends ConsoleCommand {
 
 		sail.disableValidation();
 
-		// load shapes first
+		// load shapes first from a file or URL, defaults to turtle, so one can use .shacl as file extension
 		boolean loaded = false;
 		try {
 			consoleIO.writeln("Loading shapes from " + shaclPath);
 
 			URL shaclURL = new URL(shaclPath);
-			RDFFormat format = Rio.getParserFormatForFileName(shaclPath).orElseThrow(Rio.unsupportedFormat(shaclPath));
+			RDFFormat format = Rio.getParserFormatForFileName(reportFile).orElse(RDFFormat.TURTLE);
 
 			try (SailRepositoryConnection conn = repo.getConnection()) {
 				conn.begin(IsolationLevels.NONE);
@@ -242,7 +242,8 @@ public class Verify extends ConsoleCommand {
 	}
 
 	/**
-	 * Write SHACL validation report to a file
+	 * Write SHACL validation report to a file.
+	 * File extension is used to select the serialization format, TTL is used as default.
 	 * 
 	 * @param model      report
 	 * @param reportFile file name
@@ -250,9 +251,12 @@ public class Verify extends ConsoleCommand {
 	private void writeReport(Model model, String reportFile) {
 		WriterConfig cfg = new WriterConfig();
 		cfg.set(BasicWriterSettings.PRETTY_PRINT, true);
+		cfg.set(BasicWriterSettings.INLINE_BLANK_NODES, true);
+
+		RDFFormat format = Rio.getParserFormatForFileName(reportFile).orElse(RDFFormat.TURTLE);
 
 		try (Writer w = Files.newBufferedWriter(Paths.get(reportFile))) {
-			Rio.write(model, w, RDFFormat.TURTLE, cfg);
+			Rio.write(model, w, format, cfg);
 		} catch (IOException ex) {
 			consoleIO.writeError("Could not write report to " + reportFile);
 		}
