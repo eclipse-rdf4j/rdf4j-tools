@@ -211,15 +211,6 @@
 				<maven.test.skip>true</maven.test.skip>
 			</properties>
 		</profile>
-		<profile>
-			<id>doclint-java8-disable</id>
-			<activation>
-				<jdk>[1.8,9,)</jdk>
-			</activation>
-			<properties>
-				<javadoc.opts>-Xdoclint:none</javadoc.opts>
-			</properties>
-		</profile>
 	</profiles>
 
 	<dependencyManagement>
